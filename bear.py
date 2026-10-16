@@ -1,5 +1,6 @@
 import os
 
+from helpers.bio_files import read_multiline_fasta
 from helpers.fastq import check_gc, check_length, check_quality
 
 
@@ -75,6 +76,32 @@ def filter_fastq(
                 outfile.write(line2)
                 outfile.write(line3)
                 outfile.write(line4)
+
+
+def convert_multiline_fasta_to_oneline(
+    input_fasta: str, output_fasta: str | None = None
+) -> None:
+    """
+    Конвертирует FASTA-файл с многострочными последовательностями в однострочный.
+
+    Arguments:
+        input_fasta (str):
+            Путь к входному FASTA-файлу.
+        output_fasta (str | None, optional):
+            Путь к выходному файлу. Если не указан, файл сохраняется
+            с суффиксом '_oneline.fasta' в той же директории. По умолчанию None.
+
+    """
+    if output_fasta is None:
+        base, ext = os.path.splitext(input_fasta)
+        output_fasta = base + "_oneline" + ext
+
+    fasta_data = read_multiline_fasta(input_fasta)
+
+    with open(output_fasta, "w", encoding="utf-8") as f:
+        for header, sequence in fasta_data:
+            f.write(header + "\n")
+            f.write(sequence + "\n")
 
 
 """
